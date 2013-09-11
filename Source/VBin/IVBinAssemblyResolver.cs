@@ -1,23 +1,23 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Avdm.Deploy.Sbin
+namespace VBin
 {
-    public interface ISbinAssemblyResolver
+    public interface IVBinAssemblyResolver
     {
         /// <summary>
-        /// The current sbin version.
-        /// -1 if not running from sbin
+        /// The current vbin version.
+        /// -1 if not running from vbin
         /// </summary>
         long CurrentVersion { get; }
         
         /// <summary>
-        /// Check if the current application is running from sbin
+        /// Check if the current application is running from vbin
         /// </summary>
-        bool IsRunningInSbin { get; }
+        bool IsRunningInVBin { get; }
         
         /// <summary>
-        /// Initialise sbin. You should not need to call this method
+        /// Initialise vbin. You should not need to call this method
         /// </summary>
         /// <param name="basePath"></param>
         /// <param name="version"></param>
@@ -35,7 +35,7 @@ namespace Avdm.Deploy.Sbin
         /// <summary>
         /// Create a new AppDomain and return a type from it.
         /// This must be done from the resolver as the sin infrastructure must first be configured in the new domain.
-        /// See <see cref="SbinMongoDbAssemblyResolver"/>
+        /// See <see cref="VBinMongoDbAssemblyResolver"/>
         /// </summary>
         /// <param name="domainName">Friendly name</param>
         /// <param name="setup">The AppDomainSetup</param>

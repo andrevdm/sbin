@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Reflection;
-using Avdm.Deploy.Sbin;
 
-namespace Avdm.Deploy.Manager
+namespace VBin.Manager
 {
-    public class SystemAssemblyResolver : ISbinAssemblyResolver
+    public class SystemAssemblyResolver : IVBinAssemblyResolver
     {
-        public bool IsRunningInSbin
+        public bool IsRunningInVBin
         {
             get { return false; }
         }

@@ -1,6 +1,6 @@
-sbin
+vbin
 ====
 
-SBin - run .NET applications from a virtual provider such as MongoDB / SQL
+VBin - run .NET applications from a virtual provider such as MongoDB / SQL
 
-Available on NuGet as Avdm.Deploy.Sbin
+Available on NuGet as VBin

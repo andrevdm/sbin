@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
-namespace Avdm.Deploy.Sbin
+namespace VBin
 {
     [Serializable]
     public class MachineVersion

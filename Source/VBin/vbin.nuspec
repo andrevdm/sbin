@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package >
+    <metadata>
+        <id>$id$</id>
+        <version>$version$</version>
+        <title>$title$</title>
+        <authors>Andre Van Der Merwe</authors>
+        <owners>Andre Van Der Merwe</owners>
+        <projectUrl>https://github.com/andrevdm/vbin</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>VBin - Run .NET applications from a virtual provider such as MongoDB or SQL</description>
+        <releaseNotes>Initial version</releaseNotes>
+        <copyright>Copyright 2013</copyright>
+        <tags>vbin</tags>
+    </metadata>
+
+    <files>
+        <file src="..\..\_build\Debug\vbin.pdb" target="lib\net40" /> 
+        <file src="..\..\_build\Debug\VBin.Manager.dll" target="lib\net40" /> 
+        <file src="..\..\_build\Debug\VBin.Manager.pdb" target="lib\net40" /> 
+        <file src="..\..\_build\Debug\VBin.Uploader.exe" target="lib\net40" /> 
+        <file src="..\..\_build\Debug\VBin.Uploader.pdb" target="lib\net40" /> 
+    </files>    
+</package>

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "Avdm.Deploy.Uploader" )]
-[assembly: AssemblyDescription( "SBin uploader - Run .NET applications from a virtual provider such as MongoDB / SQL " )]
+[assembly: AssemblyTitle( "VBin.Manager" )]
+[assembly: AssemblyDescription( "VBin manager - Run .NET applications from a virtual provider such as MongoDB / SQL " )]
 [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany( "" )]
-[assembly: AssemblyProduct( "Avdm.Deploy.Uploader" )]
+[assembly: AssemblyProduct( "VBin.Manager" )]
 [assembly: AssemblyCopyright( "Copyright © Andre Van Der Merwe 2013" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible( false )]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid( "8726733e-9af3-4d78-9804-424436e8b340" )]
+[assembly: Guid( "7d82b1fc-322e-424e-ad86-71c73c219687" )]
 
 // Version information for an assembly consists of the following four values:
 //

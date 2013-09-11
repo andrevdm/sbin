@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using MongoDB.Driver;
 using NDesk.Options;
 
-namespace Avdm.Deploy.Uploader
+namespace VBin.Uploader
 {
     public class UploadProgram
     {
@@ -70,14 +71,14 @@ namespace Avdm.Deploy.Uploader
 
             var client = new MongoClient( mongoConnection );
             var svr = client.GetServer();
-            var db = svr.GetDatabase( "sbin" );
+            var db = svr.GetDatabase( ConfigurationManager.AppSettings["VBinDatabase"] );
             var grid = db.GridFS;
 
             var fileSpecRegex = new Regex( filespec, RegexOptions.IgnoreCase );
 
             foreach( var file in Directory.GetFiles( sourcePath ) )
             {
-                if( !fileSpecRegex.IsMatch( file ) )
+                if( !fileSpecRegex.IsMatch( Path.GetFileName( file ) ) )
                 {
                     continue;
                 }

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "Avdm.Deploy.Sbin" )]
-[assembly: AssemblyDescription( "SBin - Run .NET applications from a virtual provider such as MongoDB / SQL " )]
+[assembly: AssemblyTitle( "VBin" )]
+[assembly: AssemblyDescription( "VBin - Run .NET applications from a virtual provider such as MongoDB / SQL " )]
 [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany( "" )]
-[assembly: AssemblyProduct( "Avdm.Deploy.Sbin" )]
+[assembly: AssemblyProduct( "VBin" )]
 [assembly: AssemblyCopyright( "Copyright © Andre Van Der Merwe 2013" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]

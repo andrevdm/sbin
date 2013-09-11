@@ -5,19 +5,19 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace Avdm.Deploy.Sbin
+namespace VBin
 {
     /// <summary>
-    /// Sbin stub
+    /// VBin stub
     /// </summary>
     /// <remarks>
     /// NB dont add any external references
     /// 
     /// Usage e.g. /// e.g. 
-    ///    explicitly select version: sbin.exe SomeApp.exe -v=1 param1 param2
-    ///    or  get version from config  : sbin.exe SomeApp.exe param1 param2
+    ///    explicitly select version: vbin.exe SomeApp.exe -v=1 param1 param2
+    ///    or  get version from config  : vbin.exe SomeApp.exe param1 param2
     /// 
-    /// The config is stored in the sbin DB in the sbinConfig collection. 
+    /// The config is stored in the vbin DB in the vbinConfig collection. 
     /// It looks like this
     ///    {
     ///           "Key" : "machineVersions",
@@ -33,27 +33,27 @@ namespace Avdm.Deploy.Sbin
     ///           ]
     ///    }
     /// </remarks>
-    public class SbinProgram
+    public class VBinProgram
     {
         private static string g_basePath;
         private static long? g_version;
         private static string g_exeName;
-        private static ISbinAssemblyResolver g_resolver;
+        private static IVBinAssemblyResolver g_resolver;
         private static string[] g_remainingArgs;
-        private static ISbinBootStrapper g_bootStrapper;
+        private static IVBinBootStrapper g_bootStrapper;
 
-        public ISbinAssemblyResolver AssemblyResolver
+        public IVBinAssemblyResolver AssemblyResolver
         {
             get { return g_resolver; }
         }
 
-        public static ISbinAssemblyResolver Initialise( string[] args )
+        public static IVBinAssemblyResolver Initialise( string[] args )
         {
             try
             {
-                string bootStrapperTypeName = ConfigurationManager.AppSettings["SbinBootStrapperType"];
+                string bootStrapperTypeName = ConfigurationManager.AppSettings["VBinBootStrapperType"];
                 Type bootStrapperType = Type.GetType( bootStrapperTypeName, true );
-                g_bootStrapper = (ISbinBootStrapper)Activator.CreateInstance( bootStrapperType );
+                g_bootStrapper = (IVBinBootStrapper)Activator.CreateInstance( bootStrapperType );
 
                 g_bootStrapper.Initialise();
                 GetVersionPaths( args );

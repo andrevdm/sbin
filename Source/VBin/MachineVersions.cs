@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Avdm.Deploy.Sbin
+namespace VBin
 {
     [Serializable]
     public class MachineVersions

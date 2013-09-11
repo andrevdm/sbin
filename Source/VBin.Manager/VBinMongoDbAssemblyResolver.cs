@@ -4,20 +4,19 @@ using System.Configuration;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Avdm.Deploy.Sbin;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using MongoDB.Driver.GridFS;
 using StructureMap;
 
-namespace Avdm.Deploy.Manager
+namespace VBin.Manager
 {
     /// <summary>
-    /// Implements ISbinAssemblyResolver
+    /// Implements IVBinAssemblyResolver
     /// Loads requested types for the current version from MonogDB
     /// </summary>
-    public class SbinMongoDbAssemblyResolver : ISbinAssemblyResolver
+    public class VBinMongoDbAssemblyResolver : IVBinAssemblyResolver
     {
         private string m_basePath;
         private string m_assemblyName;
@@ -32,7 +31,7 @@ namespace Avdm.Deploy.Manager
 
         public long CurrentVersion{ get { return m_version; } }
 
-        public bool IsRunningInSbin { get { return true; } }
+        public bool IsRunningInVBin { get { return true; } }
 
         public void Initialise( string basePath, long version, string exeName, string[] remainingArgs )
         {
@@ -45,7 +44,7 @@ namespace Avdm.Deploy.Manager
 
             var client = new MongoClient( ConfigurationManager.AppSettings["MongoDB.Server"] );
             m_svr = client.GetServer();
-            m_db = m_svr.GetDatabase( "sbin" );
+            m_db = m_svr.GetDatabase( ConfigurationManager.AppSettings["VBinDatabase"] ); 
 
             m_grid = m_db.GridFS;
 
@@ -53,9 +52,10 @@ namespace Avdm.Deploy.Manager
             Initialise();
         }
 
+        //This must be in a seperate method
         private void Initialise()
         {
-            ObjectFactory.Configure( x => x.For<ISbinAssemblyResolver>().Singleton().Use( () => this ) );
+            ObjectFactory.Configure( x => x.For<IVBinAssemblyResolver>().Singleton().Use( () => this ) );
             m_assemblies[GetType().Name] = GetType().Assembly; //TODO test caching of this assembly
         }
 
@@ -82,6 +82,7 @@ namespace Avdm.Deploy.Manager
                 }
                 else
                 {
+                    Console.WriteLine( "Assembly not found {0}", assemblyname );
                     return null;
                 }
             }
@@ -121,11 +122,11 @@ namespace Avdm.Deploy.Manager
         }
 
         /// <summary>
-        /// Create a new AppDomain, setup sbin and return the requested type
+        /// Create a new AppDomain, setup vbin and return the requested type
         /// 
-        /// In the new app domain the sbin AssemblyResolve event wont have been configured. So any
+        /// In the new app domain the vbin AssemblyResolve event wont have been configured. So any
         /// attempt to load a type will only look on the disk for the assembly and thus fail.
-        /// This method will setup sbin in the new AppDomain and then return the type that the user requested
+        /// This method will setup vbin in the new AppDomain and then return the type that the user requested
         /// </summary>
         public Tuple<AppDomain, object> CreateAndUnwrapAppDomain( string domainName, AppDomainSetup setup, string assemblyName, string typeName )
         {

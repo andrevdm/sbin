@@ -1,21 +1,21 @@
 ﻿using System;
 
-namespace Avdm.Deploy.Sbin
+namespace VBin
 {
     /// <summary>
-    /// Helper class for creating new app domains while running from sbin.
-    /// In the new app domain the sbin AssemblyResolve event wont have been configured. So any
+    /// Helper class for creating new app domains while running from vbin.
+    /// In the new app domain the vbin AssemblyResolve event wont have been configured. So any
     /// attempt to load a type will only look on the disk for the assembly and thus fail.
-    /// This class is used by ISbinAssemblyResolver.CreateAndUnwrapAppDomain to firstly setup sbin
+    /// This class is used by IVBinAssemblyResolver.CreateAndUnwrapAppDomain to firstly setup vbin
     /// and then return the type that the user requested
     /// </summary>
     public class AppDomainCreationHelper : MarshalByRefObject
     {
-        private static ISbinAssemblyResolver g_resolver;
+        private static IVBinAssemblyResolver g_resolver;
 
         public AppDomainCreationHelper( long version )
         {
-            g_resolver = SbinProgram.Initialise( new string[] { "-v=" + version, "." } );
+            g_resolver = VBinProgram.Initialise( new string[] { "-v=" + version, "." } );
         }
 
         /// <summary>

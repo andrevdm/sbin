@@ -1,14 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Configuration;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace Avdm.Deploy.Sbin
+namespace VBin
 {
-    public class MongoBootstrapper : ISbinBootStrapper
+    public class MongoBootstrapper : IVBinBootStrapper
     {
         private Assembly m_mongoBsonAssembly;
         private Assembly m_mongoDriverAssembly;
@@ -41,12 +41,12 @@ namespace Avdm.Deploy.Sbin
             m_mongoBsonAssembly = Assembly.Load( m_mongoHelper.GetAssemby( Path.Combine( basePath, "MongoDB.Bson.dll" ) ), null );
             m_mongoDriverAssembly = Assembly.Load( m_mongoHelper.GetAssemby( Path.Combine( basePath, "MongoDB.Driver.dll" ) ), null );
 
-            m_asmBytes = m_mongoHelper.GetAssemby( Path.Combine( basePath, @"Avdm.Deploy.Manager.dll" ) );
+            m_asmBytes = m_mongoHelper.GetAssemby( Path.Combine( basePath, @"VBin.Manager.dll" ) );
             m_pdbBytes = null;
 
             if( m_asmBytes == null )
             {
-                throw new InvalidOperationException( Path.Combine( basePath, @"Avdm.Deploy.Manager.dll" ) + " not found" );
+                throw new InvalidOperationException( Path.Combine( basePath, @"VBin.Manager.dll" ) + " not found" );
             }
 
             AppDomain.Unload( m_domain );
@@ -69,11 +69,11 @@ namespace Avdm.Deploy.Sbin
             return null;
         }
 
-        public ISbinAssemblyResolver CreateResolver( string[] remainingArgs )
+        public IVBinAssemblyResolver CreateResolver( string[] remainingArgs )
         {
             var deployManagerAsm = Assembly.Load( m_asmBytes, m_pdbBytes );
-            var resolverType = deployManagerAsm.GetType( "Avdm.Deploy.Manager.SbinMongoDbAssemblyResolver", true );
-            var resolver = (ISbinAssemblyResolver)Activator.CreateInstance( resolverType );
+            var resolverType = deployManagerAsm.GetType( "VBin.Manager.VBinMongoDbAssemblyResolver", true );
+            var resolver = (IVBinAssemblyResolver)Activator.CreateInstance( resolverType );
             resolver.Initialise( m_basePath, m_version, m_exeName, remainingArgs );
 
             return resolver;
@@ -111,7 +111,7 @@ namespace Avdm.Deploy.Sbin
         /// Loads the mongo DLLs to get the main assemblies in a separate appdomain
         /// This allows the main application to use a different version of the MongoDB 
         ///  drivers from the rest of the app. 
-        /// So there are no external dependencies for sbin.exe
+        /// So there are no external dependencies for vbin.exe
         /// </summary>
         private class StubMongoHelper : MarshalByRefObject, IStubMongoHelper
         {
@@ -131,8 +131,8 @@ namespace Avdm.Deploy.Sbin
                     throw new ArgumentNullException( "MongoDB.Server connection string not specified" );
                 }
 
-                byte[] mongoBsonBytes = GetManifestResourceBytes( typeof( SbinProgram ).Namespace + ".Resources.MongoDB.Bson.dll" );
-                byte[] mongoDriverBytes = GetManifestResourceBytes( typeof( SbinProgram ).Namespace + ".Resources.MongoDB.Driver.dll" );
+                byte[] mongoBsonBytes = GetManifestResourceBytes( typeof( VBinProgram ).Namespace + ".Resources.MongoDB.Bson.dll" );
+                byte[] mongoDriverBytes = GetManifestResourceBytes( typeof( VBinProgram ).Namespace + ".Resources.MongoDB.Driver.dll" );
 
                 m_mongoBsonAssembly = Assembly.Load( mongoBsonBytes );
                 m_mongoDriverAssembly = Assembly.Load( mongoDriverBytes );
@@ -145,7 +145,7 @@ namespace Avdm.Deploy.Sbin
                     null,
                     new object[] { mongoConnectionString } );
 
-                m_deployDb = m_svr.GetDatabase( "sbin" );
+                m_deployDb = m_svr.GetDatabase( ConfigurationManager.AppSettings["VBinDatabase"] ); 
                 m_grid = m_deployDb.GridFS;
 
                 var queryType = m_mongoDriverAssembly.GetType( "MongoDB.Driver.Builders.Query" );
@@ -195,7 +195,7 @@ namespace Avdm.Deploy.Sbin
 
                 var queryType = m_mongoDriverAssembly.GetType( "MongoDB.Driver.Builders.Query" );
 
-                dynamic sbinConfig = m_deployDb["sbinConfig"];
+                dynamic vbinConfig = m_deployDb["vbinConfig"];
                 var eqMethod = queryType.GetMethod( "EQ", BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod );
                 
                 var bsonValueType = eqMethod.GetParameters()[1].ParameterType;
@@ -203,9 +203,9 @@ namespace Avdm.Deploy.Sbin
 
                 var eq = eqMethod.Invoke( null, new object[] { "Key", machineVersionName } );
 
-                MethodInfo findOneAsMethodType = ((Type)sbinConfig.GetType()).GetMethods().First( m => m.Name == "FindOneAs" && m.IsGenericMethod && m.GetParameters().Length == 1 );
+                MethodInfo findOneAsMethodType = ((Type)vbinConfig.GetType()).GetMethods().First( m => m.Name == "FindOneAs" && m.IsGenericMethod && m.GetParameters().Length == 1 );
                 var findAsMethod = findOneAsMethodType.MakeGenericMethod( new[] { typeof( MachineVersions ) } );
-                var versions = (MachineVersions)findAsMethod.Invoke( sbinConfig, new[] { eq } );
+                var versions = (MachineVersions)findAsMethod.Invoke( vbinConfig, new[] { eq } );
                 m_versions = versions != null ? versions.Value : new List<MachineVersion>();
                 return m_versions;
             }

@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Avdm.Deploy.Sbin
+namespace VBin
 {
-    public interface ISbinBootStrapper
+    public interface IVBinBootStrapper
     {
         void Initialise();
         void SetVersion( long version, string basePath, string exeName );
         Assembly CurrentDomainAssemblyResolve( object sender, ResolveEventArgs args );
-        ISbinAssemblyResolver CreateResolver( string[] remainingArgs );
+        IVBinAssemblyResolver CreateResolver( string[] remainingArgs );
         IEnumerable<MachineVersion> GetVersions();
     }
 }
