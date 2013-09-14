@@ -26,12 +26,13 @@ namespace VBin.Manager
         private readonly ConcurrentDictionary<string, Assembly> m_assemblies = new ConcurrentDictionary<string, Assembly>( StringComparer.InvariantCultureIgnoreCase );
         private readonly object m_syncAsmLoad = new object();
         private long m_version = -1;
+        private bool m_runningInVBin = false;
 
         public string MainAssemblyName { get; private set; }
 
         public long CurrentVersion{ get { return m_version; } }
 
-        public bool IsRunningInVBin { get { return true; } }
+        public bool IsRunningInVBin { get { return m_runningInVBin; } }
 
         public void Initialise( string basePath, long version, string exeName, string[] remainingArgs )
         {
@@ -41,6 +42,7 @@ namespace VBin.Manager
             m_assemblyName = exeName;
             MainAssemblyName = m_assemblyName;
             m_version = version;
+            m_runningInVBin = true;
 
             var client = new MongoClient( ConfigurationManager.AppSettings["MongoDB.Server"] );
             m_svr = client.GetServer();
