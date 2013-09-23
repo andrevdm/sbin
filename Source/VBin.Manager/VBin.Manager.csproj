@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VBinManager.cs" />
     <Compile Include="VBinMongoDbAssemblyResolver.cs" />
     <Compile Include="SystemAssemblyResolver.cs" />
   </ItemGroup>

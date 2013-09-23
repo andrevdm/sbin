@@ -3,6 +3,9 @@ using System.Reflection;
 
 namespace VBin
 {
+    /// <summary>
+    /// Dont use this directly, rather use VBin.Mamanger.VBinManager which manages access to this class
+    /// </summary>
     public interface IVBinAssemblyResolver
     {
         /// <summary>
