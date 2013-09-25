@@ -4,17 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DAA99EF1-FEC4-485D-86F3-57CFB0A61071}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{D0AB3F41-76DF-486E-BB7D-DCA8B8C0F7E2}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>VBin</RootNamespace>
-    <AssemblyName>vbin</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <RootNamespace>VBin.AspNet</RootNamespace>
+    <AssemblyName>VBin.AspNet</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,10 +22,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -34,34 +32,47 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MongoDB.Bson, Version=1.8.2.34, Culture=neutral, PublicKeyToken=f686731cfb9cc103, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\mongocsharpdriver.1.8.2\lib\net35\MongoDB.Bson.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver, Version=1.8.2.34, Culture=neutral, PublicKeyToken=f686731cfb9cc103, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\mongocsharpdriver.1.8.2\lib\net35\MongoDB.Driver.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppDomainCreationHelper.cs" />
-    <Compile Include="IVBinAssemblyResolver.cs" />
-    <Compile Include="IVBinBootStrapper.cs" />
-    <Compile Include="MachineVersion.cs" />
-    <Compile Include="MachineVersions.cs" />
-    <Compile Include="MongoBootstrapper.cs" />
+    <Compile Include="AspNetInitializer.cs" />
+    <Compile Include="AspNetVirtualSite.cs" />
+    <Compile Include="AspNetVirtualSiteConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VBinProgram.cs" />
+    <Compile Include="VBinVirtualFile.cs" />
+    <Compile Include="VBinVirtualPathProvider.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <ProjectReference Include="..\VBin.Manager\VBin.Manager.csproj">
+      <Project>{3DB09CA4-4B2F-45E9-93C3-9DDA933AF596}</Project>
+      <Name>VBin.Manager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VBin\VBin.csproj">
+      <Project>{DAA99EF1-FEC4-485D-86F3-57CFB0A61071}</Project>
+      <Name>VBin</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\MongoDB.Bson.dll" />
-    <EmbeddedResource Include="Resources\MongoDB.Driver.dll" />
+    <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
-  </PropertyGroup>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

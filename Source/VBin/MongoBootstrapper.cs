@@ -86,7 +86,16 @@ namespace VBin
 
         private static IStubMongoHelper GetMongoHelper( AppDomain domain )
         {
-            object o = domain.CreateInstanceAndUnwrap( typeof( StubMongoHelper ).Assembly.FullName, typeof( StubMongoHelper ).FullName );
+            object o = domain.CreateInstanceAndUnwrap( 
+                typeof( StubMongoHelper ).Assembly.FullName, 
+                typeof( StubMongoHelper ).FullName, 
+                false,
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.CreateInstance, 
+                null,
+                new object[] { ConfigurationManager.AppSettings["MongoDB.Server"], ConfigurationManager.AppSettings["VBinDatabase"] },
+                null,
+                null );
+
             var mongoHelper = (IStubMongoHelper)o;
             return mongoHelper;
         }
@@ -122,13 +131,16 @@ namespace VBin
             private readonly Assembly m_mongoDriverAssembly;
             private List<MachineVersion> m_versions;
 
-            public StubMongoHelper()
+            public StubMongoHelper( string mongoConnectionString, string vbinDatabaseName )
             {
-                var mongoConnectionString = ConfigurationManager.AppSettings["MongoDB.Server"];
-
                 if( string.IsNullOrWhiteSpace( mongoConnectionString ) )
                 {
                     throw new ArgumentNullException( "MongoDB.Server connection string not specified" );
+                }
+
+                if( vbinDatabaseName == null )
+                {
+                    throw new ArgumentNullException( "vbinDatabaseName" );
                 }
 
                 byte[] mongoBsonBytes = GetManifestResourceBytes( typeof( VBinProgram ).Namespace + ".Resources.MongoDB.Bson.dll" );
@@ -145,7 +157,7 @@ namespace VBin
                     null,
                     new object[] { mongoConnectionString } );
 
-                m_deployDb = m_svr.GetDatabase( ConfigurationManager.AppSettings["VBinDatabase"] ); 
+                m_deployDb = m_svr.GetDatabase( vbinDatabaseName ); 
                 m_grid = m_deployDb.GridFS;
 
                 var queryType = m_mongoDriverAssembly.GetType( "MongoDB.Driver.Builders.Query" );

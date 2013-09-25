@@ -18,7 +18,17 @@
         <file src="..\..\_build\Debug\vbin.pdb" target="lib\net40" /> 
         <file src="..\..\_build\Debug\VBin.Manager.dll" target="lib\net40" /> 
         <file src="..\..\_build\Debug\VBin.Manager.pdb" target="lib\net40" /> 
-        <file src="..\..\_build\Debug\VBin.Uploader.exe" target="lib\net40" /> 
-        <file src="..\..\_build\Debug\VBin.Uploader.pdb" target="lib\net40" /> 
+        <file src="..\..\_build\Debug\VBin.AspNet.dll" target="lib\net40" /> 
+        <file src="..\..\_build\Debug\VBin.AspNet.pdb" target="lib\net40" /> 
+        
+        <file src="..\..\_build\Debug\VBin.Uploader.exe" target="tools" /> 
+        <file src="..\..\_build\Debug\VBin.Uploader.pdb" target="tools" /> 
+
+        <file src="..\VBin.AspNet.VirtualWebSite\web.config" target="tools\VBin.AspNet.VirtualWebSite" /> 
+        <file src="..\VBin.AspNet.VirtualWebSite\App_Code\AppStart.cs" target="tools\VBin.AspNet.VirtualWebSite\App_Code\AppStart.cs" /> 
+        <file src="..\VBin.AspNet.VirtualWebSite\bin\VBin.AspNet.VirtualWebSite.dll" target="tools\VBin.AspNet.VirtualWebSite\bin\VBin.AspNet.VirtualWebSite.dll" /> 
+        <file src="..\VBin.AspNet.VirtualWebSite\bin\VBin.AspNet.VirtualWebSite.pdb" target="tools\VBin.AspNet.VirtualWebSite\bin\VBin.AspNet.VirtualWebSite.pdb" /> 
+        <file src="..\VBin.AspNet.VirtualWebSite\bin\VBin.AspNet.dll" target="tools\VBin.AspNet.VirtualWebSite\bin\VBin.AspNet.dll" /> 
+        <file src="..\VBin.AspNet.VirtualWebSite\bin\VBin.AspNet.pdb" target="tools\VBin.AspNet.VirtualWebSite\bin\VBin.AspNet.pdb" /> 
     </files>    
 </package>

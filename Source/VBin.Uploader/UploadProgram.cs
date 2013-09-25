@@ -10,17 +10,24 @@ namespace VBin.Uploader
 {
     public class UploadProgram
     {
-        static void Main( string[] args )
+        static int Main( string[] args )
         {
             long version = -1;
             string host = "localhost";
             int port = 27017;
             bool showHelp = false;
-            string filespec = @"(?<!vshost)\.((exe)|(dll)|(pdb))$";
+            string filespec = null;
             string sourcePath = ".";
+            bool isAspUpload = false;
+            string aspnetSite = null;
 
             var os = new OptionSet
                          {
+                             {
+                                 "t|type=", "type of upload: standard/aspnet. Requires --aspSite=...",
+                                 v => isAspUpload = v.Trim().ToLower() == "aspnet"
+                             },
+
                              {
                                  "v|version=", "version",
                                  v => version = long.Parse( v.Trim() )
@@ -47,6 +54,11 @@ namespace VBin.Uploader
                              },
 
                              {
+                                 "aspnetSite=", "ASP.NET site being uploaded to. Requires --type=aspnet",
+                                 v => aspnetSite = v.Trim()
+                             },
+
+                             {
                                  "help", "show help",
                                  v => showHelp = true
                              },
@@ -54,18 +66,35 @@ namespace VBin.Uploader
 
             os.Parse( args );
 
-            if( showHelp || (version <= 0) || (new[] { host, filespec, sourcePath }.Any( string.IsNullOrWhiteSpace )) )
+            if( showHelp || (version <= 0) || (new[] { host, sourcePath }.Any( string.IsNullOrWhiteSpace )) )
             {
                 Console.WriteLine();
                 os.WriteOptionDescriptions( Console.Out );
-                return;
+                return 1;
             }
 
-            string basePath = version.ToString() + "\\";
+            if( isAspUpload && string.IsNullOrWhiteSpace( aspnetSite ) )
+            {
+                Console.WriteLine( "--aspnetSite option is required when --type=aspnet" );
+                return 10;
+            }
+
+            if( !isAspUpload && !string.IsNullOrWhiteSpace( aspnetSite ) )
+            {
+                Console.WriteLine( "isAspUpload option is required when --type=aspnet" );
+                return 10;
+            }
+
+            if( string.IsNullOrWhiteSpace( filespec ) )
+            {
+                filespec = !isAspUpload ? @"(?<!vshost)\.((exe)|(dll)|(pdb))$" : @"\.((gif)|(jpg)|(png)|(js)|(css)|(asmx))$";
+            }
+
+            string basePath = !isAspUpload ? version + "\\" : string.Format( "aspnet\\{0}\\{1}\\", aspnetSite, version );
 
             Console.WriteLine( "Uploading to " + basePath );
+            Console.WriteLine( "   FileSpec {0}", filespec );
             Console.Title += " - " + basePath;
-
 
             string mongoConnection = "mongodb://" + host + ":" + port;
 
@@ -94,6 +123,7 @@ namespace VBin.Uploader
                 }
             }
 
+            return 0;
         }
     }
 }
