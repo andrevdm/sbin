@@ -20,9 +20,21 @@
         <file src="..\..\_build\Debug\VBin.Manager.pdb" target="lib\net40" /> 
         <file src="..\..\_build\Debug\VBin.AspNet.dll" target="lib\net40" /> 
         <file src="..\..\_build\Debug\VBin.AspNet.pdb" target="lib\net40" /> 
-        
+        <file src="..\..\_build\Debug\NDesk.Options.dll" target="lib\net40" /> 
+
+        <file src="..\..\_build\Debug\vbin.exe" target="tools" /> 
+        <file src="..\..\_build\Debug\vbin.pdb" target="tools" /> 
+        <file src="..\..\_build\Debug\VBin.Manager.dll" target="tools" /> 
+        <file src="..\..\_build\Debug\VBin.Manager.pdb" target="tools" /> 
+        <file src="..\..\_build\Debug\VBin.AspNet.dll" target="tools" /> 
+        <file src="..\..\_build\Debug\VBin.AspNet.pdb" target="tools" /> 
         <file src="..\..\_build\Debug\VBin.Uploader.exe" target="tools" /> 
         <file src="..\..\_build\Debug\VBin.Uploader.pdb" target="tools" /> 
+        <file src="..\..\_build\Debug\NDesk.Options.dll" target="tools" /> 
+        <file src="..\..\_build\Debug\StructureMap.dll" target="tools" /> 
+        <file src="..\..\_build\Debug\StructureMap.pdb" target="tools" /> 
+        <file src="..\..\_build\Debug\MongoDB.Bson.dll" target="tools" /> 
+        <file src="..\..\_build\Debug\MongoDB.Driver.dll" target="tools" /> 
 
         <file src="..\VBin.AspNet.VirtualWebSite\web.config" target="tools\VBin.AspNet.VirtualWebSite" /> 
         <file src="..\VBin.AspNet.VirtualWebSite\App_Code\AppStart.cs" target="tools\VBin.AspNet.VirtualWebSite\App_Code\AppStart.cs" /> 
