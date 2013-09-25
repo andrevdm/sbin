@@ -27,6 +27,11 @@ namespace VBin.Manager
             get { return m_resolver.IsRunningInVBin; }
         }
 
+        public string MainAssemblyName
+        {
+            get { return m_resolver.MainAssemblyName; }
+        }
+
         public void Initialise( string basePath, long version, string exeName, string[] remainingArgs )
         {
             m_resolver.Initialise( basePath, version, exeName, remainingArgs );

@@ -18,6 +18,11 @@ namespace VBin
         /// Check if the current application is running from vbin
         /// </summary>
         bool IsRunningInVBin { get; }
+
+        /// <summary>
+        /// Name of the main assembly loaded by VBin
+        /// </summary>
+        string MainAssemblyName { get; }
         
         /// <summary>
         /// Initialise vbin. You should not need to call this method

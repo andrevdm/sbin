@@ -15,6 +15,11 @@ namespace VBin.Manager
             get { return -1; }
         }
 
+        public string MainAssemblyName
+        {
+            get { return Assembly.GetEntryAssembly().GetName().Name; }
+        }
+
         public void Initialise( string basePath, long version, string exeName, string[] remainingArgs )
         {
         }
