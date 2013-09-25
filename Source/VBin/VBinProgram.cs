@@ -52,6 +52,12 @@ namespace VBin
             try
             {
                 string bootStrapperTypeName = ConfigurationManager.AppSettings["VBinBootStrapperType"];
+
+                if( string.IsNullOrWhiteSpace( bootStrapperTypeName ) )
+                {
+                    throw new ArgumentException( "Missing VBinBootStrapperType config value" );
+                }
+
                 Type bootStrapperType = Type.GetType( bootStrapperTypeName, true );
                 g_bootStrapper = (IVBinBootStrapper)Activator.CreateInstance( bootStrapperType );
 
@@ -79,18 +85,20 @@ namespace VBin
         {
             try
             {
-                Initialise( args ); 
-                
+                Initialise( args );
+
+                string path = g_exeName;
+
+                if( !path.Contains( "." ) )
+                {
+                    throw new ArgumentException( "exe name must contain an extension", "args" );
+                }
+
                 Assembly asm = g_resolver.GetAssembly( Path.GetFileNameWithoutExtension( g_exeName ) );
 
                 if( asm == null )
                 {
-                    throw new Exception( "Can't find assembly " + g_exeName );
-                }
-
-                if( asm == null )
-                {
-                    throw new Exception( "Can't find assembly " + g_exeName );
+                    throw new FileNotFoundException( "Can't find assembly " + g_exeName );
                 }
 
                 var mainMethod = (from type in asm.GetTypes()

@@ -44,9 +44,23 @@ namespace VBin.Manager
             m_version = version;
             m_runningInVBin = true;
 
-            var client = new MongoClient( ConfigurationManager.AppSettings["MongoDB.Server"] );
+            var serverConnectionString = ConfigurationManager.AppSettings["MongoDB.Server"];
+
+            if( string.IsNullOrWhiteSpace( serverConnectionString ) )
+            {
+                throw new ArgumentException( "Config value MongoDB.Server is missing" );
+            }
+
+            var dbName = ConfigurationManager.AppSettings["VBinDatabase"];
+
+            if( string.IsNullOrWhiteSpace( dbName ) )
+            {
+                throw new ArgumentException( "Config value VBinDatabase is missing" );
+            }
+
+            var client = new MongoClient( serverConnectionString );
             m_svr = client.GetServer();
-            m_db = m_svr.GetDatabase( ConfigurationManager.AppSettings["VBinDatabase"] ); 
+            m_db = m_svr.GetDatabase( dbName ); 
 
             m_grid = m_db.GridFS;
 
@@ -112,6 +126,11 @@ namespace VBin.Manager
             lock( m_syncAsmLoad )
             {
                 var bytes = GetAssemblyBytes( assemblyname );
+
+                if( bytes == null )
+                {
+                    throw new FileNotFoundException( "No matching assembly found", assemblyname );
+                }
 
                 byte[] asmBytes = bytes.Item1;
                 byte[] pdbBytes = bytes.Item2;
