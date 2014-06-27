@@ -129,7 +129,14 @@ namespace VBin.Manager
 
                 if( bytes == null )
                 {
-                    throw new FileNotFoundException( "No matching assembly found", assemblyname );
+                    Console.WriteLine( "No matching assembly found - {0}", assemblyname );
+
+                    if( ConfigurationManager.AppSettings["Vbin.ThrowOnAsmNotFound"] == "true" )
+                    {
+                        throw new FileNotFoundException( "No matching assembly found", assemblyname );
+                    }
+
+                    return null;
                 }
 
                 byte[] asmBytes = bytes.Item1;
