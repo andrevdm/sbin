@@ -115,7 +115,7 @@ namespace VBin.Uploader
 
             Console.WriteLine();
 
-            foreach( var file in Directory.GetFiles( sourcePath ) )
+			foreach( var file in Directory.GetFiles( sourcePath ) )
             {
                 if( !fileSpecRegex.IsMatch( Path.GetFileName( file ) ) )
                 {
@@ -124,7 +124,7 @@ namespace VBin.Uploader
 
                 using( var strm = File.OpenRead( file ) )
                 {
-                    string remoteFileName = Path.Combine( basePath, Path.GetFileName( file ) );
+					string remoteFileName = basePath + Path.GetFileName( file );
 
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.WriteLine( "{0} -> {1}", file, remoteFileName );
