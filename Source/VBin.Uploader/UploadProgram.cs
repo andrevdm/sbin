@@ -2,8 +2,10 @@
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using MongoDB.Driver;
+using MongoDB.Driver.Builders;
 using NDesk.Options;
 
 namespace VBin.Uploader
@@ -19,6 +21,7 @@ namespace VBin.Uploader
             string filespec = null;
             string sourcePath = ".";
             bool isAspUpload = false;
+            bool checkBeforeUpload = false;
             string aspnetSite = null;
 
             var os = new OptionSet
@@ -56,6 +59,11 @@ namespace VBin.Uploader
                              {
                                  "aspnetSite=", "ASP.NET site being uploaded to. Requires --type=aspnet",
                                  v => aspnetSite = v.Trim()
+                             },
+
+                             {
+                                 "m|md5", "Check if file exists using mongo's MD5 hash before uploading a new one",
+                                 v => checkBeforeUpload = true
                              },
 
                              {
@@ -105,7 +113,9 @@ namespace VBin.Uploader
 
             var fileSpecRegex = new Regex( filespec, RegexOptions.IgnoreCase );
 
-            foreach( var file in Directory.GetFiles( sourcePath ) )
+            Console.WriteLine();
+
+			foreach( var file in Directory.GetFiles( sourcePath ) )
             {
                 if( !fileSpecRegex.IsMatch( Path.GetFileName( file ) ) )
                 {
@@ -114,15 +124,45 @@ namespace VBin.Uploader
 
                 using( var strm = File.OpenRead( file ) )
                 {
-                    string remoteFileName = Path.Combine( basePath, Path.GetFileName( file ) );
+					string remoteFileName = basePath + Path.GetFileName( file );
 
+                    Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.WriteLine( "{0} -> {1}", file, remoteFileName );
+                    Console.ResetColor();
+
+                    if( checkBeforeUpload )
+                    {
+                        var f = grid.FindOne( Query.EQ( "filename", remoteFileName ) );
+
+                        if( f != null )
+                        {
+                            string hash;
+
+                            using( var md5 = MD5.Create() )
+                            {
+                                using( var fstrm = File.OpenRead( file ) )
+                                {
+                                    hash = BitConverter.ToString( md5.ComputeHash( fstrm ) ).Replace( "-", "" );
+                                }
+                            }
+
+                            if( string.Compare( f.MD5, hash, StringComparison.InvariantCultureIgnoreCase ) == 0 )
+                            {
+                                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                                Console.WriteLine( "   File already up to date - skipping" );                 
+                                Console.WriteLine();
+                                Console.ResetColor();
+                                continue;
+                            }
+                        }
+                    }
 
                     grid.Delete( remoteFileName );
                     grid.Upload( strm, remoteFileName );
                 }
             }
 
+            Console.WriteLine();
             return 0;
         }
     }
