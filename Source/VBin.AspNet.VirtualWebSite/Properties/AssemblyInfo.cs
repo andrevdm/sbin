@@ -13,7 +13,7 @@ using VBin.AspNet.VirtualWebSite;
 [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany( "" )]
 [assembly: AssemblyProduct( "VBin.AspNet.VirtualWebSite" )]
-[assembly: AssemblyCopyright( "Copyright ©  2013" )]
+[assembly: AssemblyCopyright( "Copyright © Andre Van Der Merwe 2013-2014" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
 
@@ -34,5 +34,5 @@ using VBin.AspNet.VirtualWebSite;
 //
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion( "1.1.3.*" )]
+[assembly: AssemblyVersion( "1.5.1.*" )]
 [assembly: AssemblyFileVersion( "1.0.0.0" )]
