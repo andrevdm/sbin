@@ -20,8 +20,7 @@ namespace VBin.Manager
     {
         private string m_basePath;
         private string m_assemblyName;
-        private MongoServer m_svr;
-        private MongoDatabase m_db;
+        private IMongoDatabase m_db;
         private MongoGridFS m_grid;
         private readonly ConcurrentDictionary<string, Assembly> m_assemblies = new ConcurrentDictionary<string, Assembly>( StringComparer.InvariantCultureIgnoreCase );
         private readonly object m_syncAsmLoad = new object();
@@ -59,10 +58,9 @@ namespace VBin.Manager
             }
 
             var client = new MongoClient( serverConnectionString );
-            m_svr = client.GetServer();
-            m_db = m_svr.GetDatabase( dbName ); 
+            m_db = client.GetDatabase( dbName );
 
-            m_grid = m_db.GridFS;
+            m_grid = new MongoGridFS( client.GetServer(), dbName, MongoGridFSSettings.Defaults );
 
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainAssemblyResolve;
             Initialise();
