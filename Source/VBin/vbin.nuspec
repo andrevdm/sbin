@@ -2,7 +2,7 @@
 <package >
     <metadata>
         <id>$id$</id>
-        <version>1.6.2</version>
+        <version>1.6.3</version>
         <title>$title$</title>
         <authors>Andre Van Der Merwe</authors>
         <owners>Andre Van Der Merwe</owners>
@@ -15,10 +15,10 @@
     </metadata>
 
     <files>
-        <file src="..\..\_build\Debug\vbin.pdb" target="lib\net40" /> 
-        <file src="..\..\_build\Debug\VBin.Manager.dll" target="lib\net40" /> 
-        <file src="..\..\_build\Debug\VBin.Manager.pdb" target="lib\net40" /> 
-        <file src="..\..\_build\Debug\NDesk.Options.dll" target="lib\net40" /> 
+        <file src="..\..\_build\Debug\vbin.pdb" target="lib\net45" /> 
+        <file src="..\..\_build\Debug\VBin.Manager.dll" target="lib\net45" /> 
+        <file src="..\..\_build\Debug\VBin.Manager.pdb" target="lib\net45" /> 
+        <file src="..\..\_build\Debug\NDesk.Options.dll" target="lib\net45" /> 
 
         <file src="..\..\_build\Debug\vbin.exe" target="tools" /> 
         <file src="..\..\_build\Debug\vbin.pdb" target="tools" /> 
