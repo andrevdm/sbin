@@ -12,6 +12,8 @@ namespace VBin
     {
         private Assembly m_mongoBsonAssembly;
         private Assembly m_mongoDriverAssembly;
+        private Assembly m_mongoDriverLegacyAssembly;
+        private Assembly m_mongoCoreAssembly;
         private AppDomain m_domain;
         private IStubMongoHelper m_mongoHelper;
         private byte[] m_asmBytes;
@@ -40,6 +42,8 @@ namespace VBin
 
             m_mongoBsonAssembly = Assembly.Load( m_mongoHelper.GetAssemby( Path.Combine( basePath, "MongoDB.Bson.dll" ) ), null );
             m_mongoDriverAssembly = Assembly.Load( m_mongoHelper.GetAssemby( Path.Combine( basePath, "MongoDB.Driver.dll" ) ), null );
+            m_mongoDriverLegacyAssembly = Assembly.Load( m_mongoHelper.GetAssemby( Path.Combine( basePath, "MongoDB.Driver.Legacy.dll" ) ), null );
+            m_mongoCoreAssembly = Assembly.Load( m_mongoHelper.GetAssemby( Path.Combine( basePath, "MongoDB.Driver.Core.dll" ) ), null );
 
             m_asmBytes = m_mongoHelper.GetAssemby( Path.Combine( basePath, @"VBin.Manager.dll" ) );
             m_pdbBytes = null;
@@ -64,6 +68,16 @@ namespace VBin
             if( assemblyname == "MongoDB.Driver" )
             {
                 return m_mongoDriverAssembly;
+            }
+
+            if( assemblyname == "MongoDB.Driver.Legacy" )
+            {
+                return m_mongoDriverLegacyAssembly;
+            }
+
+            if( assemblyname == "MongoDB.Driver.Core" )
+            {
+                return m_mongoCoreAssembly;
             }
 
             return null;
@@ -124,11 +138,12 @@ namespace VBin
         /// </summary>
         private class StubMongoHelper : MarshalByRefObject, IStubMongoHelper
         {
-            private readonly dynamic m_svr;
             private readonly dynamic m_deployDb;
             private readonly dynamic m_grid;
             private readonly Assembly m_mongoBsonAssembly;
             private readonly Assembly m_mongoDriverAssembly;
+            private readonly Assembly m_mongoDriverLegacyAssembly;
+            private readonly Assembly m_mongoDriverCoreAssembly;
             private List<MachineVersion> m_versions;
 
             public StubMongoHelper( string mongoConnectionString, string vbinDatabaseName )
@@ -143,24 +158,41 @@ namespace VBin
                     throw new ArgumentNullException( "vbinDatabaseName" );
                 }
 
-                byte[] mongoBsonBytes = GetManifestResourceBytes( typeof( VBinProgram ).Namespace + ".Resources.MongoDB.Bson.dll" );
-                byte[] mongoDriverBytes = GetManifestResourceBytes( typeof( VBinProgram ).Namespace + ".Resources.MongoDB.Driver.dll" );
+                //Try load the asm of disk first. This fixes issues when the mongo assemblies are in the vbin folder. When the first assembly is loaded from
+                // a resource the remainder are looked for on disk first. You then get cant convert a T to a T error. This way if the files exist locally they
+                // are used, else the embedded resources are used
+                Func<string, Assembly> loadAsm = name =>
+                {
+                    try
+                    {
+                        var asm = Assembly.Load( name );
+                        return asm;
+                    }
+                    catch( Exception )
+                    {
+                        byte[] bytes = GetManifestResourceBytes( typeof( VBinProgram ).Namespace + ".Resources." + name + ".dll" );
+                        return Assembly.Load( bytes );
+                    }
+                };
 
-                m_mongoBsonAssembly = Assembly.Load( mongoBsonBytes );
-                m_mongoDriverAssembly = Assembly.Load( mongoDriverBytes );
+                m_mongoBsonAssembly = loadAsm( "MongoDB.Bson" );
+                m_mongoDriverAssembly = loadAsm( "MongoDB.Driver" );
+                m_mongoDriverCoreAssembly = loadAsm( "MongoDB.Driver.Core" );
+                m_mongoDriverLegacyAssembly = loadAsm( "MongoDB.Driver.Legacy" );
                 AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainAssemblyResolve;
 
-                m_svr = m_mongoDriverAssembly.GetType( "MongoDB.Driver.MongoServer" ).InvokeMember(
-                    "Create",
-                    BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod,
-                    null,
-                    null,
-                    new object[] { mongoConnectionString } );
+                dynamic client = Activator.CreateInstance( 
+                    m_mongoDriverAssembly.GetType( "MongoDB.Driver.MongoClient" ), 
+                    mongoConnectionString );
 
-                m_deployDb = m_svr.GetDatabase( vbinDatabaseName ); 
+                //Using the legacy extension method to get the legacy server class. TODO remove this once GridFS support is released
+                var extensions = m_mongoDriverLegacyAssembly.GetType( "MongoDB.Driver.MongoClientExtensions", true );
+                dynamic svr = extensions.GetMethod( "GetServer" ).Invoke( null, new object[]{ client } );
+
+                m_deployDb = svr.GetDatabase( vbinDatabaseName ); 
                 m_grid = m_deployDb.GridFS;
 
-                var queryType = m_mongoDriverAssembly.GetType( "MongoDB.Driver.Builders.Query" );
+                var queryType = m_mongoDriverLegacyAssembly.GetType( "MongoDB.Driver.Builders.Query" );
                 var queryMatchesMethod = queryType.GetMethod( "Matches", BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod );
 
                 Func<Regex, object> createBsonRegex = r =>
@@ -205,9 +237,9 @@ namespace VBin
                     return m_versions;
                 }
 
-                var queryType = m_mongoDriverAssembly.GetType( "MongoDB.Driver.Builders.Query" );
+                var queryType = m_mongoDriverLegacyAssembly.GetType( "MongoDB.Driver.Builders.Query" );
 
-                dynamic vbinConfig = m_deployDb["vbinConfig"];
+                dynamic vbinConfig = m_deployDb.GetCollection("vbinConfig");
                 var eqMethod = queryType.GetMethod( "EQ", BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod );
                 
                 var bsonValueType = eqMethod.GetParameters()[1].ParameterType;
@@ -215,7 +247,10 @@ namespace VBin
 
                 var eq = eqMethod.Invoke( null, new object[] { "Key", machineVersionName } );
 
-                MethodInfo findOneAsMethodType = ((Type)vbinConfig.GetType()).GetMethods().First( m => m.Name == "FindOneAs" && m.IsGenericMethod && m.GetParameters().Length == 1 );
+                MethodInfo findOneAsMethodType = ((Type)vbinConfig.GetType()).
+                    GetMethods().
+                    First( m => m.Name == "FindOneAs" && m.IsGenericMethod && m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType.FullName == "MongoDB.Driver.IMongoQuery" );
+
                 var findAsMethod = findOneAsMethodType.MakeGenericMethod( new[] { typeof( MachineVersions ) } );
                 var versions = (MachineVersions)findAsMethod.Invoke( vbinConfig, new[] { eq } );
                 m_versions = versions != null ? versions.Value : new List<MachineVersion>();
@@ -263,6 +298,16 @@ namespace VBin
                 if( assemblyname == "MongoDB.Driver" )
                 {
                     return m_mongoDriverAssembly;
+                }
+
+                if( assemblyname == "MongoDB.Driver.Legacy" )
+                {
+                    return m_mongoDriverLegacyAssembly;
+                }
+
+                if( assemblyname == "MongoDB.Driver.Core" )
+                {
+                    return m_mongoDriverCoreAssembly;
                 }
 
                 return null;
