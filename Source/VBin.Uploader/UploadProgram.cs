@@ -20,17 +20,10 @@ namespace VBin.Uploader
             bool showHelp = false;
             string filespec = null;
             string sourcePath = ".";
-            bool isAspUpload = false;
             bool checkBeforeUpload = false;
-            string aspnetSite = null;
 
             var os = new OptionSet
                          {
-                             {
-                                 "t|type=", "type of upload: standard/aspnet. Requires --aspSite=...",
-                                 v => isAspUpload = v.Trim().ToLower() == "aspnet"
-                             },
-
                              {
                                  "v|version=", "version",
                                  v => version = long.Parse( v.Trim() )
@@ -57,11 +50,6 @@ namespace VBin.Uploader
                              },
 
                              {
-                                 "aspnetSite=", "ASP.NET site being uploaded to. Requires --type=aspnet",
-                                 v => aspnetSite = v.Trim()
-                             },
-
-                             {
                                  "m|md5", "Check if file exists using mongo's MD5 hash before uploading a new one",
                                  v => checkBeforeUpload = true
                              },
@@ -81,24 +69,12 @@ namespace VBin.Uploader
                 return 1;
             }
 
-            if( isAspUpload && string.IsNullOrWhiteSpace( aspnetSite ) )
-            {
-                Console.WriteLine( "--aspnetSite option is required when --type=aspnet" );
-                return 10;
-            }
-
-            if( !isAspUpload && !string.IsNullOrWhiteSpace( aspnetSite ) )
-            {
-                Console.WriteLine( "isAspUpload option is required when --type=aspnet" );
-                return 10;
-            }
-
             if( string.IsNullOrWhiteSpace( filespec ) )
             {
-                filespec = !isAspUpload ? @"(?<!vshost)\.((exe)|(dll)|(pdb))$" : @"\.((gif)|(jpg)|(png)|(js)|(css)|(asmx))$";
+                filespec = @"(?<!vshost)\.((exe)|(dll)|(pdb))$";
             }
 
-            string basePath = !isAspUpload ? version + "\\" : string.Format( "aspnet\\{0}\\{1}\\", aspnetSite, version );
+			string basePath = version + "\\";
 
             Console.WriteLine( "Uploading to " + basePath );
             Console.WriteLine( "   FileSpec {0}", filespec );
