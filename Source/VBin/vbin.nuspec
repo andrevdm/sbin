@@ -2,23 +2,24 @@
 <package >
     <metadata>
         <id>$id$</id>
-        <version>1.6.5</version>
+        <version>1.6.6</version>
         <title>$title$</title>
         <authors>Andre Van Der Merwe</authors>
         <owners>Andre Van Der Merwe</owners>
         <projectUrl>https://github.com/andrevdm/vbin</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>VBin - Run .NET applications from a virtual provider such as MongoDB or SQL</description>
-        <releaseNotes>Minor fixes</releaseNotes>
+        <releaseNotes>.net 4.5</releaseNotes>
         <copyright>Copyright 2013-2015</copyright>
         <tags>vbin</tags>
     </metadata>
 
     <files>
-        <file src="..\..\_build\Debug\vbin.pdb" target="lib\net40" /> 
-        <file src="..\..\_build\Debug\VBin.Manager.dll" target="lib\net40" /> 
-        <file src="..\..\_build\Debug\VBin.Manager.pdb" target="lib\net40" /> 
-        <file src="..\..\_build\Debug\NDesk.Options.dll" target="lib\net40" /> 
+        <file src="..\..\_build\Debug\vbin.exe" target="lib\net45" /> 
+        <file src="..\..\_build\Debug\vbin.pdb" target="lib\net45" /> 
+        <file src="..\..\_build\Debug\VBin.Manager.dll" target="lib\net45" /> 
+        <file src="..\..\_build\Debug\VBin.Manager.pdb" target="lib\net45" /> 
+        <file src="..\..\_build\Debug\NDesk.Options.dll" target="lib\net45" /> 
 
         <file src="..\..\_build\Debug\vbin.exe" target="tools" /> 
         <file src="..\..\_build\Debug\vbin.pdb" target="tools" /> 
