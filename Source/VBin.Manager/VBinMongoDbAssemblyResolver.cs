@@ -96,7 +96,10 @@ namespace VBin.Manager
                 }
                 else
                 {
-                    Console.WriteLine( "Assembly not found {0}", assemblyname );
+                    if( ConfigurationManager.AppSettings["VBin.Debug"] == "true" )
+                    {
+                        Console.WriteLine("Assembly not found {0}", assemblyname);
+                    }
                     return null;
                 }
             }
