@@ -40,17 +40,17 @@ namespace VBin
             m_basePath = basePath;
             m_exeName = exeName;
 
-            m_mongoBsonAssembly = Assembly.Load( m_mongoHelper.GetAssemby( Path.Combine( basePath, "MongoDB.Bson.dll" ) ), null );
-            m_mongoDriverAssembly = Assembly.Load( m_mongoHelper.GetAssemby( Path.Combine( basePath, "MongoDB.Driver.dll" ) ), null );
-            m_mongoDriverLegacyAssembly = Assembly.Load( m_mongoHelper.GetAssemby( Path.Combine( basePath, "MongoDB.Driver.Legacy.dll" ) ), null );
-            m_mongoCoreAssembly = Assembly.Load( m_mongoHelper.GetAssemby( Path.Combine( basePath, "MongoDB.Driver.Core.dll" ) ), null );
+            m_mongoBsonAssembly = Assembly.Load( m_mongoHelper.GetAssemby( basePath + "MongoDB.Bson.dll" ), null );
+            m_mongoDriverAssembly = Assembly.Load( m_mongoHelper.GetAssemby( basePath + "MongoDB.Driver.dll" ), null );
+            m_mongoDriverLegacyAssembly = Assembly.Load( m_mongoHelper.GetAssemby( basePath + "MongoDB.Driver.Legacy.dll" ), null );
+            m_mongoCoreAssembly = Assembly.Load( m_mongoHelper.GetAssemby( basePath + "MongoDB.Driver.Core.dll" ), null );
 
-            m_asmBytes = m_mongoHelper.GetAssemby( Path.Combine( basePath, @"VBin.Manager.dll" ) );
+            m_asmBytes = m_mongoHelper.GetAssemby( basePath + @"VBin.Manager.dll" );
             m_pdbBytes = null;
 
             if( m_asmBytes == null )
             {
-                throw new InvalidOperationException( Path.Combine( basePath, @"VBin.Manager.dll" ) + " not found" );
+                throw new InvalidOperationException( basePath + @"VBin.Manager.dll" + " not found" );
             }
 
             AppDomain.Unload( m_domain );
@@ -264,16 +264,23 @@ namespace VBin
 
             private byte[] ReadMongoFile( string fileName )
             {
-                var found = m_grid.FindOne( g_createFileNameQuery( fileName ) );
+				try
+				{
+                	var found = m_grid.FindOne( g_createFileNameQuery( fileName ) );
 
-                byte[] bytes;
-                using( var g = found.OpenRead() )
-                {
-                    bytes = new byte[g.Length];
-                    g.Read( bytes, 0, bytes.Length );
-                }
+                	byte[] bytes;
+                	using( var g = found.OpenRead() )
+                	{
+                    	bytes = new byte[g.Length];
+                    	g.Read( bytes, 0, bytes.Length );
+                	}
 
-                return bytes;
+                	return bytes;
+				}
+				catch( Exception ex ) 
+				{
+					throw new InvalidOperationException( "Error getting file " + fileName, ex );
+				}			
             }
 
             private byte[] GetManifestResourceBytes( string name )

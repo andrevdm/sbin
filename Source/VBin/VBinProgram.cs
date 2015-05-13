@@ -101,10 +101,17 @@ namespace VBin
                     throw new FileNotFoundException( "Can't find assembly " + g_exeName );
                 }
 
-                var mainMethod = (from type in asm.GetTypes()
-                                  from t in type.GetMethods( BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static )
-                                  where t.Name == "Main"
-                                  select t).FirstOrDefault();
+                var mainMethod = asm.EntryPoint;
+
+				if( mainMethod == null )
+				{
+					throw new InvalidProgramException( "No entry point found in " + g_exeName );
+				}
+
+				if( ConfigurationManager.AppSettings ["VBin.Debug"] == "true" ) 
+				{
+					Console.WriteLine( "entryPoint = {0}", mainMethod );
+				}
 
                 mainMethod.Invoke( null, mainMethod.GetParameters().Length > 0 ? new object[] { g_remainingArgs } : null );
             }

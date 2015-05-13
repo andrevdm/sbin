@@ -127,7 +127,10 @@ namespace VBin.Manager
 
                 if( bytes == null )
                 {
-                    Console.WriteLine( "No matching assembly found - {0}", assemblyname );
+					if( ConfigurationManager.AppSettings ["VBin.Debug"] == "true" ) 
+					{
+						Console.WriteLine( "No matching assembly found - {0}", assemblyname );
+					}					
 
                     if( ConfigurationManager.AppSettings["Vbin.ThrowOnAsmNotFound"] == "true" )
                     {
@@ -142,6 +145,11 @@ namespace VBin.Manager
 
                 var assembly = Assembly.Load( asmBytes, pdbBytes );
                 m_assemblies[assemblyname] = assembly;
+
+				if( ConfigurationManager.AppSettings ["VBin.Debug"] == "true" ) 
+				{
+					Console.WriteLine( "resolving {0}, found={1}", assemblyname, assembly != null );
+				}
 
                 return assembly;
             }
@@ -188,7 +196,7 @@ namespace VBin.Manager
 
         private string FormatGridFileName( string assemblyname )
         {
-            string path = Path.Combine( m_basePath, assemblyname );
+            string path = m_basePath + assemblyname;
             return path;
         }
     }
