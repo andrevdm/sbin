@@ -14,7 +14,7 @@ namespace VBin.Manager
 
         public VBinManager()
         {
-            m_resolver = ObjectFactory.GetInstance<IVBinAssemblyResolver>() ?? new SystemAssemblyResolver();
+            m_resolver = ObjectFactory.Container.TryGetInstance<IVBinAssemblyResolver>() ?? new SystemAssemblyResolver();
         }
 
         public long CurrentVersion
