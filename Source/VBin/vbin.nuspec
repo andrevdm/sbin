@@ -2,14 +2,14 @@
 <package >
     <metadata>
         <id>$id$</id>
-        <version>1.6.8</version>
+        <version>1.6.9</version>
         <title>$title$</title>
         <authors>Andre Van Der Merwe</authors>
         <owners>Andre Van Der Merwe</owners>
         <projectUrl>https://github.com/andrevdm/vbin</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>VBin - Run .NET applications from a virtual provider such as MongoDB or SQL</description>
-        <releaseNotes>.net 4.5</releaseNotes>
+        <releaseNotes>nuget updates</releaseNotes>
         <copyright>Copyright 2013-2015</copyright>
         <tags>vbin</tags>
     </metadata>
