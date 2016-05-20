@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
@@ -36,11 +37,12 @@ namespace VBin
     public class VBinProgram
     {
         private static string g_basePath;
-        private static long? g_version;
+        private static long g_version;
         private static string g_exeName;
         private static IVBinAssemblyResolver g_resolver;
         private static string[] g_remainingArgs;
         private static IVBinBootStrapper g_bootStrapper;
+        private static SettingsParser.VBinSettings g_settings;
 
         public IVBinAssemblyResolver AssemblyResolver
         {
@@ -51,7 +53,9 @@ namespace VBin
         {
             try
             {
-                string bootStrapperTypeName = ConfigurationManager.AppSettings["VBinBootStrapperType"];
+                g_settings = SettingsParser.ParseArgs( args );
+
+                string bootStrapperTypeName = GetOrConfig( "VBinBootStrapperType" ) ?? "VBin.MongoBootstrapper,vbin";
 
                 if( string.IsNullOrWhiteSpace( bootStrapperTypeName ) )
                 {
@@ -62,8 +66,8 @@ namespace VBin
                 g_bootStrapper = (IVBinBootStrapper)Activator.CreateInstance( bootStrapperType );
 
                 g_bootStrapper.Initialise();
-                GetVersionPaths( args );
-                g_bootStrapper.SetVersion( g_version.Value, g_basePath, g_exeName );
+                GetVersionPaths();
+                g_bootStrapper.SetVersion( g_version, g_basePath, g_exeName );
 
                 //Give the bootstrapper the opportunity to resolve assemblies first
                 AppDomain.CurrentDomain.AssemblyResolve += g_bootStrapper.CurrentDomainAssemblyResolve;
@@ -103,15 +107,15 @@ namespace VBin
 
                 var mainMethod = asm.EntryPoint;
 
-				if( mainMethod == null )
-				{
-					throw new InvalidProgramException( "No entry point found in " + g_exeName );
-				}
+                if( mainMethod == null )
+                {
+                    throw new InvalidProgramException( "No entry point found in " + g_exeName );
+                }
 
-				if( ConfigurationManager.AppSettings ["VBin.Debug"] == "true" ) 
-				{
-					Console.WriteLine( "entryPoint = {0}", mainMethod );
-				}
+                if( GetOrConfig( "VBin.Debug" ) == "true" )
+                {
+                    Console.WriteLine( "entryPoint = {0}", mainMethod );
+                }
 
                 mainMethod.Invoke( null, mainMethod.GetParameters().Length > 0 ? new object[] { g_remainingArgs } : null );
             }
@@ -123,30 +127,13 @@ namespace VBin
             }
         }
 
-        private static void GetVersionPaths( string[] args )
+        private static void GetVersionPaths()
         {
-            if( args.Length < 1 )
+            g_exeName = g_settings.ExeName;
+            g_remainingArgs = g_settings.RemainingArgs;
+
+            if( g_settings.Version == null )
             {
-                throw new ArgumentOutOfRangeException( "args", "Too few arguments. Expecting startup name" );
-            }
-
-            g_version = Match<long?>( args[0], @"-v=(?<x>\d+)", "x", s => long.Parse( s ) );
-
-            if( g_version != null )
-            {
-                if( args.Length < 2 )
-                {
-                    throw new ArgumentOutOfRangeException( "args", "Too few arguments. Missing startup name" );
-                }
-
-                g_exeName = args[1];
-                g_remainingArgs = args.Length > 2 ? args.Skip( 2 ).ToArray() : new string[] { };
-            }
-            else
-            {
-                g_exeName = args[0];
-                g_remainingArgs = args.Length > 1 ? args.Skip( 1 ).ToArray() : new string[] { };
-
                 g_version = 1;
 
                 var versions = g_bootStrapper.GetVersions();
@@ -156,17 +143,18 @@ namespace VBin
                     if( ver.MachineRegex.IsMatch( Environment.MachineName ) )
                     {
                         g_version = ver.Version;
+                        break;
                     }
                 }
+            }
+            else
+            {
+                g_version = g_settings.Version.Value;
             }
 
             g_basePath = g_version + "\\";
         }
 
-        private static T Match<T>( string text, string pattern, string groupName, Func<string, T> onMatch )
-        {
-            var match = Regex.Match( text, pattern, RegexOptions.IgnoreCase );
-            return match.Success ? onMatch( match.Groups[groupName].Value ) : default( T );
-        }
+        public static string GetOrConfig( string key ) => g_settings.GetOrConfig( key );
     }
 }

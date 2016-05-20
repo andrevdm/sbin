@@ -25,7 +25,7 @@ namespace VBin
 
         public void Initialise()
         {
-            if( string.IsNullOrWhiteSpace( ConfigurationManager.AppSettings["MongoDB.Server"] ) )
+            if( string.IsNullOrWhiteSpace( VBinProgram.GetOrConfig( "MongoDB.Server" ) ) )
             {
                 throw new ArgumentNullException( "MongoDB.Server connection string not specified" );
             }
@@ -106,7 +106,7 @@ namespace VBin
                 false,
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.CreateInstance, 
                 null,
-                new object[] { ConfigurationManager.AppSettings["MongoDB.Server"], ConfigurationManager.AppSettings["VBinDatabase"] },
+                new object[] { VBinProgram.GetOrConfig( "MongoDB.Server" ), VBinProgram.GetOrConfig( "VBinDatabase" ) },
                 null,
                 null );
 

@@ -29,9 +29,9 @@ namespace VBin.Manager
 
         public string MainAssemblyName { get; private set; }
 
-        public long CurrentVersion{ get { return m_version; } }
+        public long CurrentVersion => m_version;
 
-        public bool IsRunningInVBin { get { return m_runningInVBin; } }
+        public bool IsRunningInVBin => m_runningInVBin;
 
         public void Initialise( string basePath, long version, string exeName, string[] remainingArgs )
         {
@@ -43,14 +43,14 @@ namespace VBin.Manager
             m_version = version;
             m_runningInVBin = true;
 
-            var serverConnectionString = ConfigurationManager.AppSettings["MongoDB.Server"];
+            var serverConnectionString = VBinProgram.GetOrConfig( "MongoDB.Server" );
 
             if( string.IsNullOrWhiteSpace( serverConnectionString ) )
             {
                 throw new ArgumentException( "Config value MongoDB.Server is missing" );
             }
 
-            var dbName = ConfigurationManager.AppSettings["VBinDatabase"];
+            var dbName = VBinProgram.GetOrConfig( "VBinDatabase" );
 
             if( string.IsNullOrWhiteSpace( dbName ) )
             {
@@ -96,7 +96,7 @@ namespace VBin.Manager
                 }
                 else
                 {
-                    if( ConfigurationManager.AppSettings["VBin.Debug"] == "true" )
+                    if( VBinProgram.GetOrConfig( "VBin.Debug" ) == "true" )
                     {
                         Console.WriteLine("Assembly not found {0}", assemblyname);
                     }
@@ -130,12 +130,12 @@ namespace VBin.Manager
 
                 if( bytes == null )
                 {
-					if( ConfigurationManager.AppSettings ["VBin.Debug"] == "true" ) 
+					if( VBinProgram.GetOrConfig( "VBin.Debug" ) == "true" ) 
 					{
 						Console.WriteLine( "No matching assembly found - {0}", assemblyname );
 					}					
 
-                    if( ConfigurationManager.AppSettings["Vbin.ThrowOnAsmNotFound"] == "true" )
+                    if( VBinProgram.GetOrConfig( "Vbin.ThrowOnAsmNotFound" ) == "true" )
                     {
                         throw new FileNotFoundException( "No matching assembly found", assemblyname );
                     }
@@ -149,7 +149,7 @@ namespace VBin.Manager
                 var assembly = Assembly.Load( asmBytes, pdbBytes );
                 m_assemblies[assemblyname] = assembly;
 
-				if( ConfigurationManager.AppSettings ["VBin.Debug"] == "true" ) 
+				if( VBinProgram.GetOrConfig( "VBin.Debug" ) == "true" ) 
 				{
 					Console.WriteLine( "resolving {0}, found={1}", assemblyname, assembly != null );
 				}
