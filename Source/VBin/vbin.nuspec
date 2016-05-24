@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package >
     <metadata>
-        <id>$id$</id>
-        <version>1.7.1</version>
-        <title>$title$</title>
+        <id>VBin</id>
+        <version>1.7.2</version>
+        <title>VBin</title>
         <authors>Andre Van Der Merwe</authors>
         <owners>Andre Van Der Merwe</owners>
         <projectUrl>https://github.com/andrevdm/vbin</projectUrl>
